@@ -26,7 +26,7 @@ if arquivo:
         pass
 
     elif aba == "🚛 Sugestão de Alocação":
-        render_sugestao_alocacao(upload_base=arquivo)s as pd
+render_sugestao_alocacao(upload_base=arquivo)s as pd
 from unidecode import unidecode
 
 st.set_page_config(layout='wide')
