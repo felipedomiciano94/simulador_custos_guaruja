@@ -14,6 +14,7 @@ if arquivo:
     aba = st.sidebar.radio("Escolha a aba:", [
         "🔍 Simulador por Rota",
         "📋 Demandas do Dia",
+        "🚛 Sugestão de Alocação"
     ])
 
     if aba == "🔍 Simulador por Rota":
@@ -24,61 +25,8 @@ if arquivo:
         # seu código aqui
         pass
 
-    # --- SUGESTÃO DE ALOCAÇÃO --- #
-    st.markdown("### 📊 Sugestão de Alocação com Base nos Custos Embutidos")
-
-    if arquivo:
-        df_depara = pd.read_excel(arquivo, sheet_name="DEPARA", header=1)
-        df_demandas = pd.read_excel(arquivo, sheet_name="Base Importacao", header=1)
-
-        df_depara.columns = ['LOCAL_ORIGINAL', 'LOCAL_PADRAO']
-        df_depara['LOCAL_ORIGINAL'] = df_depara['LOCAL_ORIGINAL'].str.strip().str.upper()
-        df_depara['LOCAL_PADRAO'] = df_depara['LOCAL_PADRAO'].str.strip().str.upper()
-        df_demandas['ORIGEM_NORM'] = df_demandas['ORIGEM'].str.strip().str.upper()
-        df_demandas['DESTINO_NORM'] = df_demandas['DESTINO'].str.strip().str.upper()
-
-        df_demandas = df_demandas.merge(df_depara, how='left', left_on='ORIGEM_NORM', right_on='LOCAL_ORIGINAL')
-        df_demandas['ORIGEM_FINAL'] = df_demandas['LOCAL_PADRAO'].fillna(df_demandas['ORIGEM'])
-        df_demandas.drop(columns=['LOCAL_ORIGINAL', 'LOCAL_PADRAO'], inplace=True)
-
-        df_demandas = df_demandas.merge(df_depara, how='left', left_on='DESTINO_NORM', right_on='LOCAL_ORIGINAL')
-        df_demandas['DESTINO_FINAL'] = df_demandas['LOCAL_PADRAO'].fillna(df_demandas['DESTINO'])
-        df_demandas.drop(columns=['LOCAL_ORIGINAL', 'LOCAL_PADRAO'], inplace=True)
-
-        ROTAS_CUSTOS = {
-            ("SANTOS/SP", "MOVECTA T2"): {"AGREGADO": 1361, "FROTA": 1098},
-            ("MOVECTA T2", "SANTOS/SP"): {"AGREGADO": 1361, "FROTA": 1098},
-            ("SANTOS/SP", "GUARUJÁ/SP"): {"AGREGADO": 1361, "FROTA": 1098},
-            ("GUARUJÁ/SP", "SANTOS/SP"): {"AGREGADO": 1361, "FROTA": 1098},
-        }
-
-        def obter_custos(row):
-            rota = (row["ORIGEM_FINAL"], row["DESTINO_FINAL"])
-            if rota in ROTAS_CUSTOS:
-                return pd.Series([ROTAS_CUSTOS[rota]["AGREGADO"], ROTAS_CUSTOS[rota]["FROTA"]])
-            return pd.Series([None, None])
-
-        df_demandas[["CUSTO AGREGADO", "CUSTO FROTA"]] = df_demandas.apply(obter_custos, axis=1)
-
-        def calcular_sugestao(row):
-            if pd.isna(row["CUSTO AGREGADO"]) or pd.isna(row["CUSTO FROTA"]):
-                return pd.Series(["NÃO DEFINIDO", None, None])
-            if row["CUSTO FROTA"] < row["CUSTO AGREGADO"]:
-                return pd.Series(["FROTA", "FROTA", row["CUSTO AGREGADO"] - row["CUSTO FROTA"]])
-            return pd.Series(["AGREGADO", "AGREGADO", 0])
-
-        df_demandas[["ALOCACAO SUGERIDA", "MELHOR CUSTO", "SAVING RECUPERADO"]] = df_demandas.apply(calcular_sugestao, axis=1)
-
-        colunas = [
-            "ALOCACAO SUGERIDA", "SOLICITACAO_CARGA_ID", "DATA", "CLIENTE",
-            "ORIGEM_FINAL", "DESTINO_FINAL", "HORÁRIO REQUERIDO", "AGENDAMENTO",
-            "CUSTO AGREGADO", "CUSTO FROTA", "MELHOR CUSTO", "SAVING RECUPERADO"
-        ]
-        df_resultado = df_demandas[colunas]
-        df_resultado = df_resultado.rename(columns={"SOLICITACAO_CARGA_ID": "DEMANDA KMM"})
-
-        st.dataframe(df_resultado, use_container_width=True)
-
+    elif aba == "🚛 Sugestão de Alocação":
+        render_sugestao_alocacao(upload_base=arquivo)s as pd
 from unidecode import unidecode
 
 st.set_page_config(layout='wide')
@@ -91,6 +39,7 @@ arquivo = st.file_uploader("📁 Faça o upload do arquivo base_importacao_guaru
 
 if arquivo:
     aba = st.sidebar.radio("Escolha a aba:", ["🔍 Simulador por Rota", "📋 Demandas do Dia"])
+    "🚛 Sugestão de Alocação"
     df_rotas = pd.DataFrame(ROTAS_CUSTOS)
     df_rotas["ORIGEM_NORM"] = df_rotas["ORIGEM"].apply(lambda x: unidecode(x.upper().strip()))
     df_rotas["DESTINO_NORM"] = df_rotas["DESTINO"].apply(lambda x: unidecode(x.upper().strip()))
@@ -126,3 +75,5 @@ if arquivo:
 else:
     st.warning("⚠️ Faça o upload do arquivo base_importacao_guaruja.xlsx para iniciar o simulador.")
 
+if aba == "🚛 Sugestão de Alocação":
+        render_sugestao_alocacao(upload_base=arquivo, upload_precos=None)
