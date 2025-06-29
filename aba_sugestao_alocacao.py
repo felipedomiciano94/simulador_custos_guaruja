@@ -10,12 +10,13 @@ def render_sugestao_alocacao(upload_base=None, upload_precos=None):
     st.subheader("🚚 Sugestão de Alocação de Frota / Agregado")
 
     # Uploads (integração com Streamlit principal)
-    if upload_base is not None:
-        aba_demanda = pd.read_excel(upload_base, sheet_name=0)
-        aba_depara = pd.read_excel(upload_base, sheet_name='DEPARA')
-    else:
-        st.warning("Nenhum arquivo de base importado.")
-        return
+   # Precificação embutida no código
+precos_df = pd.DataFrame([
+    {'ORIGEM': 'GUARUJÁ/SP', 'DESTINO': 'ADAMANTINA/SP', 'CUSTO_AGREGADO': 8856.75, 'CUSTO_FROTA': 11480.85},
+    {'ORIGEM': 'GUARUJÁ/SP', 'DESTINO': 'ADOLFO/SP', 'CUSTO_AGREGADO': 7424.97, 'CUSTO_FROTA': 10010.23},
+    # Adicione mais linhas conforme necessário
+])
+
 
     if upload_precos is not None:
         precos_df = pd.read_excel(upload_precos, sheet_name='Precificacao_guaruja')
