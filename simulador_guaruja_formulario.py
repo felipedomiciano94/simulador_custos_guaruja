@@ -42,7 +42,7 @@ if arquivo:
         except Exception as e:
             st.error(f"Erro ao ler a planilha: {e}")
     elif aba == "🚛 Sugestão de Alocação":
-    render_sugestao_alocacao(upload_base=arquivo)
+        render_sugestao_alocacao(upload_base=arquivo)
        
 else:
     st.warning("⚠️ Faça o upload do arquivo base_importacao_guaruja.xlsx para iniciar o simulador.")
