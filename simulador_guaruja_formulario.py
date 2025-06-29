@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from unidecode import unidecode
 
+
 st.set_page_config(layout='wide')
 st.title('🚛 Simulador por Rota - Guarujá')
 
@@ -26,7 +27,7 @@ if arquivo:
         pass
 
     elif aba == "🚛 Sugestão de Alocação":
-from unidecode import unidecode
+
 
 st.set_page_config(layout='wide')
 st.title('🚛 Simulador por Rota - Guarujá')
