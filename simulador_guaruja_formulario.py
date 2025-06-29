@@ -1,3 +1,4 @@
+from aba_sugestao_alocacao import render_sugestao_alocacao
 import streamlit as st
 import pandas as pd
 from unidecode import unidecode
@@ -11,7 +12,22 @@ ROTAS_CUSTOS = [{'ORIGEM': 'GUARUJÁ/SP', 'DESTINO': 'ADAMANTINA/SP', 'CUSTO_AGR
 arquivo = st.file_uploader("📁 Faça o upload do arquivo base_importacao_guaruja.xlsx", type=["xlsx"])
 
 if arquivo:
-    aba = st.sidebar.radio("Escolha a aba:", ["🔍 Simulador por Rota", "📋 Demandas do Dia"])
+   aba = st.sidebar.radio("Escolha a aba:", [
+    "🔍 Simulador por Rota", 
+    "📋 Demandas do Dia", 
+    "🚚 Sugestão de Alocação"
+])
+    if aba == "🔍 Simulador por Rota":
+        # Código atual do simulador por rota aqui
+        pass  # Substitua pelo conteúdo real
+
+    elif aba == "📋 Demandas do Dia":
+        # Código da aba de demandas aqui
+        pass  # Substitua pelo conteúdo real
+
+    elif aba == "🚚 Sugestão de Alocação":
+        render_sugestao_alocacao(upload_base=arquivo, upload_precos=None)
+
     
     df_rotas = pd.DataFrame(ROTAS_CUSTOS)
     df_rotas["ORIGEM_NORM"] = df_rotas["ORIGEM"].apply(lambda x: unidecode(x.upper().strip()))
