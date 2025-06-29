@@ -11,7 +11,7 @@ ROTAS_CUSTOS = [{'ORIGEM': 'GUARUJÁ/SP', 'DESTINO': 'ADAMANTINA/SP', 'CUSTO_AGR
 arquivo = st.file_uploader("📁 Faça o upload do arquivo base_importacao_guaruja.xlsx", type=["xlsx"])
 
 if arquivo:
-    aba = st.sidebar.radio("Escolha a aba:", ["🔍 Simulador por Rota", "📋 Demandas do Dia"])
+    aba = st.sidebar.radio("Escolha a aba:", ["🔍 Simulador por Rota", "📋 Demandas do Dia", "🚛 Sugestão de Alocação"])
     "🚛 Sugestão de Alocação"
     df_rotas = pd.DataFrame(ROTAS_CUSTOS)
     df_rotas["ORIGEM_NORM"] = df_rotas["ORIGEM"].apply(lambda x: unidecode(x.upper().strip()))
