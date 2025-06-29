@@ -14,7 +14,6 @@ if arquivo:
     aba = st.sidebar.radio("Escolha a aba:", [
         "🔍 Simulador por Rota",
         "📋 Demandas do Dia",
-        "🚛 Sugestão de Alocação"
     ])
 
     if aba == "🔍 Simulador por Rota":
@@ -80,8 +79,6 @@ if arquivo:
 
         st.dataframe(df_resultado, use_container_width=True)
 
-    elif aba == "🚛 Sugestão de Alocação":
-        render_sugestao_alocacao(upload_base=arquivo)s as pd
 from unidecode import unidecode
 
 st.set_page_config(layout='wide')
@@ -94,7 +91,6 @@ arquivo = st.file_uploader("📁 Faça o upload do arquivo base_importacao_guaru
 
 if arquivo:
     aba = st.sidebar.radio("Escolha a aba:", ["🔍 Simulador por Rota", "📋 Demandas do Dia"])
-    "🚛 Sugestão de Alocação"
     df_rotas = pd.DataFrame(ROTAS_CUSTOS)
     df_rotas["ORIGEM_NORM"] = df_rotas["ORIGEM"].apply(lambda x: unidecode(x.upper().strip()))
     df_rotas["DESTINO_NORM"] = df_rotas["DESTINO"].apply(lambda x: unidecode(x.upper().strip()))
@@ -130,5 +126,3 @@ if arquivo:
 else:
     st.warning("⚠️ Faça o upload do arquivo base_importacao_guaruja.xlsx para iniciar o simulador.")
 
-if aba == "🚛 Sugestão de Alocação":
-        render_sugestao_alocacao(upload_base=arquivo, upload_precos=None)
