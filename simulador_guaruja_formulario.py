@@ -14,28 +14,32 @@ if not arquivo:
     st.stop()
 
 # -----------------------------
-# 2. Carregar custos de rota via CSV
+# 2. Carregar custos de rota via CSV tab-delimitado
 # -----------------------------
 try:
     df_custos = pd.read_csv(
         "rotas_embutidas.csv",
+        sep="\t",                       # usa tabulação como separador
         dtype={"CUSTO_FROTA": float, "CUSTO_AGREGADO": float}
     )
 except FileNotFoundError:
     st.error("❌ Arquivo 'rotas_embutidas.csv' não encontrado. Verifique o nome e o caminho.")
     st.stop()
 
-# Padronizar colunas
+# Padronizar nomes de colunas
 df_custos.columns = df_custos.columns.str.upper().str.strip()
+
+# Validar colunas essenciais
 required = {"ORIGEM", "DESTINO", "CUSTO_FROTA", "CUSTO_AGREGADO"}
 if not required.issubset(df_custos.columns):
     faltam = required - set(df_custos.columns)
     st.error(f"❌ Colunas ausentes em rotas_embutidas.csv: {faltam}")
     st.stop()
 
-# Normalizar texto para lookup
+# Normalizar para lookup
 df_custos["ORIGEM_NORM"] = df_custos["ORIGEM"].apply(lambda x: unidecode(str(x).upper().strip()))
 df_custos["DESTINO_NORM"] = df_custos["DESTINO"].apply(lambda x: unidecode(str(x).upper().strip()))
+
 
 # -----------------------------
 # 3. Leitura da planilha de demandas e De-Para
