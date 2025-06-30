@@ -4,6 +4,7 @@ from unidecode import unidecode
 
 st.set_page_config(page_title="Simulador Guarujá", layout="wide")
 st.image("logo.png", width=150)
+st.title("🚛 Simulador por Rota - Guarujá")
 
 
 # Upload base
