@@ -18,7 +18,7 @@ if not arquivo:
 # -----------------------------
 try:
     df_custos = pd.read_csv(
-        "rotas_embutidas.csv",  # arquivo gerado por você
+        "rotas_embutidas.csv",  # nome exato do seu arquivo
         sep="\t",               # tabulação como separador
         dtype={"CUSTO_FROTA": float, "CUSTO_AGREGADO": float}
     )
@@ -26,7 +26,7 @@ except FileNotFoundError:
     st.error("❌ Arquivo 'rotas_embutidas.csv' não encontrado. Verifique nome e caminho.")
     st.stop()
 
-# Padronizar nomes de colunas e remover espaços
+# Padronizar colunas
 df_custos.columns = df_custos.columns.str.upper().str.strip()
 
 # Validar colunas essenciais
@@ -37,21 +37,11 @@ if faltam:
     st.stop()
 
 # Normalizar para lookup
-df_custos["ORIGEM_NORM"] = df_custos["ORIGEM"].apply(lambda x: unidecode(str(x).upper().strip()))
+df_custos["ORIGEM_NORM"]  = df_custos["ORIGEM"].apply(lambda x: unidecode(str(x).upper().strip()))
 df_custos["DESTINO_NORM"] = df_custos["DESTINO"].apply(lambda x: unidecode(str(x).upper().strip()))
 
 # -----------------------------
-# 3. Leitura da planilha de demandas e De-Para
-# -----------------------------
-df_demandas = pd.read_excel(arquivo, sheet_name="Base Importacao", skiprows=1)
-df_depara   = pd.read_excel(arquivo, sheet_name="DEPARA")
-
-# Padronizar cabeçalhos
-df_depara.columns   = df_depara.columns.str.upper().str.strip()
-df_demandas.columns = df_demandas.columns.str.upper().str.strip()
-
-# -----------------------------
-# 4. Menu de abas
+# 3. Menu de abas
 # -----------------------------
 aba = st.sidebar.radio(
     "Escolha a aba:",
@@ -59,16 +49,16 @@ aba = st.sidebar.radio(
 )
 
 # -----------------------------
-# 5. Simulador por Rota
+# 4. Simulador por Rota
 # -----------------------------
 if aba == "🚛 Simulador por Rota":
     st.title("🚛 Simulador por Rota - Guarujá")
 
-    origem = st.selectbox("Escolha a origem", df_custos["ORIGEM"].unique())
+    origem  = st.selectbox("Escolha a origem",  df_custos["ORIGEM"].unique())
     destino = st.selectbox("Escolha o destino", df_custos["DESTINO"].unique())
 
     rota = df_custos[
-        (df_custos["ORIGEM"] == origem) &
+        (df_custos["ORIGEM"]  == origem) &
         (df_custos["DESTINO"] == destino)
     ]
     if rota.empty:
@@ -86,23 +76,34 @@ if aba == "🚛 Simulador por Rota":
         c4.metric("✅ Saving Recuperado", f"R$ {saving:,.2f}")
 
 # -----------------------------
-# 6. Demandas do Dia + Sugestão de Alocação
+# 5. Demandas do Dia + Sugestão de Alocação
 # -----------------------------
 elif aba == "📋 Demandas do Dia":
     st.title("📋 Demandas do Dia + Sugestão de Alocação")
 
-    # Mapear ORIGEM e DESTINO via DEPARA
-    mapeia_orig = dict(zip(df_depara["ORIGEM PLANILHA"], df_depara["ORIGEM REAL"]))
-    mapeia_dest = dict(zip(df_depara["DESTINO PLANILHA"], df_depara["DESTINO REAL"]))
+    # Ler somente dentro deste bloco
+    df_demandas = pd.read_excel(arquivo, sheet_name="Base Importacao", skiprows=1)
+    df_depara   = pd.read_excel(arquivo, sheet_name="DEPARA")
 
-    df_demandas["ORIGEM_MAPEADA"]  = df_demandas["ORIGEM"].map(mapeia_orig)
-    df_demandas["DESTINO_MAPEADO"] = df_demandas["DESTINO"].map(mapeia_dest)
+    # Padronizar cabeçalhos
+    df_depara.columns   = df_depara.columns.str.upper().str.strip()
+    df_demandas.columns = df_demandas.columns.str.upper().str.strip()
+
+    # Mapear ORIGEM via DEPARA
+    mapeia_orig = dict(zip(
+        df_depara["LOCAL_ORIGEM_RAW"],
+        df_depara["ORIGEM (CIDADE/UF)"]
+    ))
+    df_demandas["ORIGEM_MAPEADA"] = df_demandas["ORIGEM"].map(mapeia_orig)
+
+    # DESTINO já está correto
+    df_demandas["DESTINO_MAPEADO"] = df_demandas["DESTINO"]
 
     # Normalizar para merge
     df_demandas["ORIGEM_NORM"]  = df_demandas["ORIGEM_MAPEADA"].apply(lambda x: unidecode(str(x).upper().strip()))
     df_demandas["DESTINO_NORM"] = df_demandas["DESTINO_MAPEADO"].apply(lambda x: unidecode(str(x).upper().strip()))
 
-    # Cruzar com custos carregados
+    # Cruzar com custos
     df_merge = pd.merge(
         df_demandas,
         df_custos,
@@ -120,10 +121,12 @@ elif aba == "📋 Demandas do Dia":
         axis=1
     )
 
-    # Colunas finais para exibição
+    # Colunas para exibir
     mostrar = [
         "DEMANDA KMM", "DATA", "CLIENTE",
-        "ORIGEM", "DESTINO", "HORÁRIO REQUERIDO", "AGENDAMENTO",
-        "CUSTO_AGREGADO", "CUSTO_FROTA", "MELHOR CUSTO", "SAVING RECUPERADO"
+        "ORIGEM_MAPEADA", "DESTINO_MAPEADO",
+        "HORÁRIO REQUERIDO", "AGENDAMENTO",
+        "CUSTO_AGREGADO", "CUSTO_FROTA",
+        "MELHOR CUSTO", "SAVING RECUPERADO"
     ]
     st.dataframe(df_merge[mostrar], use_container_width=True)
