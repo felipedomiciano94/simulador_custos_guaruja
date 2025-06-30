@@ -4,7 +4,7 @@ from unidecode import unidecode
 
 st.set_page_config(page_title="Simulador Guarujá", layout="wide")
 st.image("logo.png", width=150)
-st.title("🚛 Simulador por Rota - Guarujá")
+st.title("🚛 Simulador de custos Transporte - Guarujá")
 
 
 # Upload base
@@ -61,7 +61,7 @@ if aba == "🚛 Simulador de Rota":
         col1.metric("💰 Custo Frota", f"R$ {custo_frota:,.2f}")
         col2.metric("🚛 Custo Agregado", f"R$ {custo_agregado:,.2f}")
         col3.metric("📌 Melhor Custo", melhor_modal)
-        col4.metric("✅ Poupança Recuperada", f"R$ {saving:,.2f}")
+        col4.metric("✅ Saving Recuperado", f"R$ {saving:,.2f}")
 
 # -------------------- ABA 2 - DEMANDAS DO DIA --------------------
 elif aba == "📋 Demandas do Dia":
