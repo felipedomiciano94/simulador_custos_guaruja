@@ -18,28 +18,27 @@ if not arquivo:
 # -----------------------------
 try:
     df_custos = pd.read_csv(
-        "rotas_embutidas.csv",
-        sep="\t",                       # usa tabulação como separador
+        "rotas_embutidas.csv",  # arquivo gerado por você
+        sep="\t",               # tabulação como separador
         dtype={"CUSTO_FROTA": float, "CUSTO_AGREGADO": float}
     )
 except FileNotFoundError:
-    st.error("❌ Arquivo 'rotas_embutidas.csv' não encontrado. Verifique o nome e o caminho.")
+    st.error("❌ Arquivo 'rotas_embutidas.csv' não encontrado. Verifique nome e caminho.")
     st.stop()
 
-# Padronizar nomes de colunas
+# Padronizar nomes de colunas e remover espaços
 df_custos.columns = df_custos.columns.str.upper().str.strip()
 
 # Validar colunas essenciais
 required = {"ORIGEM", "DESTINO", "CUSTO_FROTA", "CUSTO_AGREGADO"}
-if not required.issubset(df_custos.columns):
-    faltam = required - set(df_custos.columns)
+faltam = required - set(df_custos.columns)
+if faltam:
     st.error(f"❌ Colunas ausentes em rotas_embutidas.csv: {faltam}")
     st.stop()
 
 # Normalizar para lookup
 df_custos["ORIGEM_NORM"] = df_custos["ORIGEM"].apply(lambda x: unidecode(str(x).upper().strip()))
 df_custos["DESTINO_NORM"] = df_custos["DESTINO"].apply(lambda x: unidecode(str(x).upper().strip()))
-
 
 # -----------------------------
 # 3. Leitura da planilha de demandas e De-Para
@@ -87,16 +86,16 @@ if aba == "🚛 Simulador por Rota":
         c4.metric("✅ Saving Recuperado", f"R$ {saving:,.2f}")
 
 # -----------------------------
-# 6. Demandas do Dia + Sugestão
+# 6. Demandas do Dia + Sugestão de Alocação
 # -----------------------------
 elif aba == "📋 Demandas do Dia":
     st.title("📋 Demandas do Dia + Sugestão de Alocação")
 
     # Mapear ORIGEM e DESTINO via DEPARA
-    mapeia_orig   = dict(zip(df_depara["ORIGEM PLANILHA"], df_depara["ORIGEM REAL"]))
-    mapeia_dest   = dict(zip(df_depara["DESTINO PLANILHA"], df_depara["DESTINO REAL"]))
+    mapeia_orig = dict(zip(df_depara["ORIGEM PLANILHA"], df_depara["ORIGEM REAL"]))
+    mapeia_dest = dict(zip(df_depara["DESTINO PLANILHA"], df_depara["DESTINO REAL"]))
 
-    df_demandas["ORIGEM_MAPEADA"] = df_demandas["ORIGEM"].map(mapeia_orig)
+    df_demandas["ORIGEM_MAPEADA"]  = df_demandas["ORIGEM"].map(mapeia_orig)
     df_demandas["DESTINO_MAPEADO"] = df_demandas["DESTINO"].map(mapeia_dest)
 
     # Normalizar para merge
@@ -112,7 +111,7 @@ elif aba == "📋 Demandas do Dia":
     )
 
     # Calcular sugestão
-    df_merge["MELHOR CUSTO"] = df_merge.apply(
+    df_merge["MELHOR CUSTO"]      = df_merge.apply(
         lambda r: "Frota Própria" if r["CUSTO_FROTA"] < r["CUSTO_AGREGADO"] else "Agregado",
         axis=1
     )
@@ -121,10 +120,10 @@ elif aba == "📋 Demandas do Dia":
         axis=1
     )
 
-    # Colunas finais
+    # Colunas finais para exibição
     mostrar = [
         "DEMANDA KMM", "DATA", "CLIENTE",
-        "ORIGEM", "DESTINO","HORÁRIO REQUERIDO","AGENDAMENTO",
-        "CUSTO_AGREGADO","CUSTO_FROTA","MELHOR CUSTO","SAVING RECUPERADO"
+        "ORIGEM", "DESTINO", "HORÁRIO REQUERIDO", "AGENDAMENTO",
+        "CUSTO_AGREGADO", "CUSTO_FROTA", "MELHOR CUSTO", "SAVING RECUPERADO"
     ]
     st.dataframe(df_merge[mostrar], use_container_width=True)
