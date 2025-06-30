@@ -36,7 +36,7 @@ aba = st.sidebar.radio("Escolha a aba:", ["🚛 Simulador de Rota", "📋 Demand
 
 # -------------------- ABA 1 - SIMULADOR DE ROTA --------------------
 if aba == "🚛 Simulador de Rota":
-    st.title("🚛 Simulador por Rota - Guarujá")
+    st.title("🚛 Consulta de Rotas")
 
     origem = st.selectbox("Escolha a origem", sorted(df_custos["ORIGEM"].unique()))
     destino = st.selectbox("Escolha o destino", sorted(df_custos["DESTINO"].unique()))
