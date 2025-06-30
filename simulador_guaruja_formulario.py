@@ -1,8 +1,16 @@
 import streamlit as st
 import pandas as pd
 from unidecode import unidecode
+from PIL import Image
 
 st.set_page_config(page_title="Simulador Guarujá", layout="wide")
+def exibir_logo():
+    logo_path = "logo.png"  # Certifique-se de que este arquivo está na mesma pasta do .py
+    try:
+        logo = Image.open(logo_path)
+        st.sidebar.image(logo, width=150)  # Logo na lateral esquerda (sidebar)
+    except FileNotFoundError:
+        st.sidebar.warning("⚠️ Logo 'logo.png' não encontrado.")
 
 # Upload base
 arquivo = st.file_uploader("📂 Faça o upload do arquivo base_importacao_guaruja.xlsx", type="xlsx")
