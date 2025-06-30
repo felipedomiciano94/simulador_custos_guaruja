@@ -1,7 +1,11 @@
 import streamlit as st
 import pandas as pd
 from unidecode import unidecode
-
+st.set_page_config(
+    page_title="Simulador Guarujá",  # título da aba do navegador
+    layout="wide",                   # layout em tela cheia
+    initial_sidebar_state="expanded" # sidebar já aberta
+)
 # -----------------------------
 # 1. Upload do arquivo de demandas
 # -----------------------------
