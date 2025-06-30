@@ -3,6 +3,7 @@ import pandas as pd
 from unidecode import unidecode
 
 st.set_page_config(page_title="Simulador Guarujá", layout="wide")
+st.image("logo.png", width=150)
 
 
 # Upload base
