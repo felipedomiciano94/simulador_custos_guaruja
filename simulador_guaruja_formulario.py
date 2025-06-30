@@ -51,7 +51,7 @@ aba = st.sidebar.radio(
 # -----------------------------
 # 4. Simulador por Rota
 # -----------------------------
-if aba == "🚛 Simulador por Rota":
+if aba == "🚛 Simulador por Rota" layout="wide":
     st.title("🚛 Simulador por Rota - Guarujá")
 
     origem  = st.selectbox("Escolha a origem",  df_custos["ORIGEM"].unique())
